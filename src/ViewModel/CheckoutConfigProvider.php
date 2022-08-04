@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Hyva\ReactCheckout\ViewModel;
 
 use Magento\Checkout\Model\CompositeConfigProvider;
+use Magento\Framework\App\ProductMetadataInterface;
 use Magento\Framework\Serialize\SerializerInterface;
 use Magento\Framework\View\Element\Block\ArgumentInterface;
 use Magento\Framework\Locale\ResolverInterface as LocaleResolverInterface;
@@ -31,22 +32,30 @@ class CheckoutConfigProvider implements ArgumentInterface
     private $currencyProvider;
 
     /**
+     * @var ProductMetadataInterface
+     */
+    private $productMetdata;
+
+    /**
      * CheckoutConfigProvider constructor.
      *
      * @param SerializerInterface $serializer
      * @param LocaleResolverInterface $localeResolver
+     * @param ProductMetadataInterface $productMetadata
      * @param CompositeConfigProvider $compositeConfigProvider
      */
     public function __construct(
         SerializerInterface $serializer,
         LocaleResolverInterface $localeResolver,
+        ProductMetadataInterface $productMetadata,
         CompositeConfigProvider $compositeConfigProvider,
         CurrencyProvider $currencyProvider
     ) {
         $this->serializer = $serializer;
         $this->localeResolver = $localeResolver;
-        $this->compositeConfigProvider = $compositeConfigProvider;
         $this->currencyProvider = $currencyProvider;
+        $this->productMetdata = $productMetadata;
+        $this->compositeConfigProvider = $compositeConfigProvider;
     }
 
     /**
@@ -73,6 +82,7 @@ class CheckoutConfigProvider implements ArgumentInterface
             'payment' => $checkoutConfig['payment'],
             'language' => $this->localeResolver->getLocale(),
             'currency' => $this->currencyProvider->getConfig(),
+            'magentoVersion' => $this->productMetdata->getVersion(),
             'defaultCountryId' => $checkoutConfig['defaultCountryId'],
         ]);
     }
